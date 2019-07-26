@@ -1,0 +1,3 @@
+requests>=2.22.0
+gophish>=0.2.5
+pyhunter>=0.3
