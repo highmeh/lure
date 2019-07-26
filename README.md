@@ -11,6 +11,11 @@ Lure currently searches the following sources:
 - theHarvester
 - LinkedIn (via Bing Search API)
 
+## How do I run Lure?  
+- Edit config.py to ensure your API keys and paths are correct.
+- Give lure a domain to search and wait:
+  - ``./lure.py -d microsoft.com``
+
 ## What if I already have a list of targets?
 You can use the ``./lure.py -d domain.com -f /path/to/file.csv`` options to import a csv file in GoPhish format. Lure will append any search results to that list before uploading it.
 
