@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from pyhunter import PyHunter
 import xml.etree.ElementTree as ET
-import os
-
+import subprocess
+from subprocess import DEVNULL
 
 # Define text styling
 end_text = "\033[0m"
@@ -42,14 +42,14 @@ def get_harvester_emails(company_domain,harvester_location):
 	outfile = "/tmp/harvester_{0}_results.xml".format(company)
 	print(success_text + "[+] Checking theHarvester...")
 	print("    (Note: This may take a while)" + end_text)
-	
-	subprocess_cmd = "python {0} -d {1} -b bing,dogpile,google,yahoo -f {2} >/dev/null 2>&1".format(
-					 									harvester_location,company_domain,outfile)
-	os.system(subprocess_cmd)
-	
+
+	subprocess_cmd = ['python', harvester_location, '-d', company_domain, '-b', 
+			'bing,dogpile,google,yahoo', '-f', outfile, '>/dev/null', '2>&1']
+
+	subprocess.Popen(subprocess_cmd, stdout=DEVNULL, stderr=DEVNULL)
+
 	tree = ET.parse(outfile)
 	root = tree.getroot()
 	for emails in root.findall('email'):
 		harvester_emails.append(",,{0},".format(emails.text))
 	return harvester_emails
-
