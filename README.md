@@ -1,2 +1,30 @@
-# lure
+# LURE
 Lure - User Recon Automation for GoPhish
+  
+  
+## What is Lure?
+Lure assists in phishing target collection by pulling and parsing email addresses for a target organization. The results are normalized into a format recognized by GoPhish, and then uploaded to the server.  
+  
+## What sources does Lure search?  
+Lure currently searches the following sources:
+- Hunter.io
+- theHarvester
+- LinkedIn (via Bing Search API)
+
+## What if I already have a list of targets?
+You can use the ``./lure.py -d domain.com -f /path/to/file.csv`` options to import a csv file in GoPhish format. Lure will append any search results to that list before uploading it.
+
+## What is the Gophish Format for the CSV?
+Use ``./lure.py -t`` to generate a CSV template.
+
+## Can I customize which sources Lure uses?
+Yes, edit resources/config.py and change the sources to "True" or "False"
+
+## Lure is taking a long time to complete.
+Disable theHarvester in resources/config.py. theHarvester takes a long time to generate very few results. 
+
+## Where do I enter API keys, tester names, and other variables?
+Edit resources/config.py. You can run ``mv resources/config.sample.py resources/config.py`` to fill in the configuration template.
+
+## Lure says it found X number of emails, but the GoPhish group shows a different number.
+GoPhish will not accept invalid entries. If one of the email addresses is collected erroneously and ends up being "username@something@domain.com", "u....sername@domain.com", etc, it will be rejected during the upload.
