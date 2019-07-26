@@ -12,6 +12,8 @@ Lure currently searches the following sources:
 - LinkedIn (via Bing Search API)
 
 ## How do I run Lure?  
+- Clone the git repo: ``git clone https://github.com/highmeh/lure/lure.git``
+- Install the prerequisites: ``pip3 install -r requirements.txt``
 - Edit config.py to ensure your API keys and paths are correct.
 - Give lure a domain to search and wait:
   - ``./lure.py -d microsoft.com``
