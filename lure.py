@@ -134,7 +134,7 @@ def upload_targetlist(master_list_contents,target_company):
 
 # Set up Argparse
 progdesc = """ L U R E (Lazy User-Reconnaissance Engine) :: Automate email collection and
-			import results into GoPhish. Built by Jayme Hancock (jhancock@appsecconsulting.com"""
+			import results into GoPhish. Built by Jayme Hancock (jhancock@appsecconsulting.com)"""
 parser = argparse.ArgumentParser(description=progdesc)
 parser.add_argument('-d', metavar='Company Domain', help='Ex: appsecconsulting.com')
 parser.add_argument('-f', metavar='Email File', help='Append an existing CSV to search results')
