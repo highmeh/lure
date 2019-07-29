@@ -2,18 +2,14 @@
 import requests,sys,argparse,csv,os
 from gophish import Gophish
 from gophish.models import *
-from resources import config,search_email,logo,bing
+from resources import config,hunterio,harvester,logo,bing
 from datetime import datetime
+from resources.ui import end_text,warning_text,success_text,fail_text,print_logo
 
 # Suppress certificate verification warnings. 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# Define text styling
-end_text = "\033[0m"
-warning_text = "\033[93m"
-success_text = "\033[92m"
-fail_text = "\033[91m"
 
 # Define the GoPhish API connection
 API = Gophish(config.GOPHISH_API_KEY,config.BASE_URL,verify=False)
@@ -41,7 +37,7 @@ def list_resources():
 # Checks if the GoPhish server is online
 def check_connection():
 	try:
-		r = requests.get(config.BASE_URL,verify=False)
+		r = requests.get(config.BASE_URL,verify=False,timeout=config.TIMEOUT)
 		if r.status_code == 200:
 			gophish_status = (success_text + "[+] GoPhish Server Online" + end_text)
 		else:
@@ -55,12 +51,12 @@ def check_connection():
 # Use the search_email.py module to search common resources for email addresses
 def start_discovery(target_company):
 	if config.HUNTERIO == True:
-		hunterio_emails = search_email.get_hunterio_emails(company_domain,config.HUNTERIO_API_KEY)
+		hunterio_emails = hunterio.get_hunterio_emails(company_domain,config.HUNTERIO_API_KEY)
 	if config.HUNTERIO == False:
 		hunterio_emails = ""
 
 	if config.THEHARVESTER == True:
-		harvester_emails = search_email.get_harvester_emails(
+		harvester_emails = harvester.get_harvester_emails(
 											company_domain,config.HARVESTER_LOCATION)
 	if config.THEHARVESTER == False: 
 		harvester_emails = ""
@@ -70,8 +66,9 @@ def start_discovery(target_company):
 		company = company_domain.split('.')[0]
 		linkedin_emails = bing.scrape_linkedin(company,config.BING_ENDPOINT,config.BING_API_KEY)
 		bing_emails = bing.sanitize_results(linkedin_emails,target_company)
+
 	if config.LINKEDIN == False:
-		linkedin_emails = ""
+		bing_emails = ""
 
 	create_master_list(hunterio_emails,harvester_emails,bing_emails,target_company)
 
@@ -134,7 +131,7 @@ def upload_targetlist(master_list_contents,target_company):
 
 # Set up Argparse
 progdesc = """ L U R E (Lazy User-Reconnaissance Engine) :: Automate email collection and
-			import results into GoPhish. Built by Jayme Hancock (jhancock@appsecconsulting.com)"""
+			import results into GoPhish. Built by Jayme Hancock (jhancock@appsecconsulting.com"""
 parser = argparse.ArgumentParser(description=progdesc)
 parser.add_argument('-d', metavar='Company Domain', help='Ex: appsecconsulting.com')
 parser.add_argument('-f', metavar='Email File', help='Append an existing CSV to search results')

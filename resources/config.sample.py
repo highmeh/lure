@@ -13,4 +13,6 @@ VERSION = "Lure v0.1"
 HUNTERIO = True
 THEHARVESTER = False
 LINKEDIN = True
+
+TIMEOUT = 5
 HARVESTER_LOCATION = "/usr/share/theHarvester/theHarvester.py"

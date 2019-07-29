@@ -2,11 +2,9 @@
 import requests
 import json
 import re
+from .ui import end_text,warning_text,success_text
 
-end_text = "\033[0m"
-warning_text = "\033[93m"
-success_text = "\033[92m"
-output_file = 0
+
 linkedin_emails = []
 
 

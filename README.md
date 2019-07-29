@@ -35,3 +35,8 @@ Edit resources/config.py. You can run ``mv resources/config.sample.py resources/
 
 ## Lure says it found X number of emails, but the GoPhish group shows a different number.
 GoPhish will not accept invalid entries. If one of the email addresses is collected erroneously and ends up being "username@something@domain.com", "u....sername@domain.com", etc, it will be rejected during the upload.
+
+## Screenshots
+![Lure Command Line](https://github.com/highmeh/lure/screenshots/lure_cli.png)
+
+![Lure Importing to GoPhish](https://github.com/highmeh/lure/screenshots/lure_gophish.png)
