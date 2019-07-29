@@ -8,3 +8,17 @@ def print_logo():
 	print("               jhancock@appsecconsulting.com")
 	print("-----------------------------------------------------------" + end_text)
 	return
+
+def print_fail(text):
+	output = fail_text + text + end_text
+	print(output)
+	#return output
+
+def print_success(text):
+	output = success_text + text + end_text
+	print(output)
+
+def print_warning(text):
+	output = warning_text + text + end_text
+	print(output)
+	

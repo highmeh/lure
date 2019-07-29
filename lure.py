@@ -4,7 +4,7 @@ from gophish import Gophish
 from gophish.models import *
 from resources import config,hunterio,harvester,logo,bing
 from datetime import datetime
-from resources.ui import end_text,warning_text,success_text,fail_text,print_logo
+from resources.ui import *
 
 # Suppress certificate verification warnings. 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -30,7 +30,7 @@ def list_resources():
 		print("  [✓] TheHarvester")
 	if config.THEHARVESTER == False:
 		print("  [ ] TheHarvester")
-	print(warning_text + ("-" * 59) + end_text)
+	print_warning("-" * 59)
 	print("\n")
 		
 
@@ -39,12 +39,12 @@ def check_connection():
 	try:
 		r = requests.get(config.BASE_URL,verify=False,timeout=config.TIMEOUT)
 		if r.status_code == 200:
-			gophish_status = (success_text + "[+] GoPhish Server Online" + end_text)
+			gophish_status = success_text + "[+] GoPhish Server Online" + end_text
 		else:
-			gophish_status = (fail_text + "[-] GoPhish Server Offline" + end_text)
+			gophish_status = fail_text + "[-] GoPhish Server Offline" + end_text
 		return gophish_status
 	except:	
-		gophish_status = (fail_text + "[-] GoPhish Server Offline" + end_text)
+		gophish_status = fail_text + "[-] GoPhish Server Offline" + end_text
 		return gophish_status
 
 
@@ -110,7 +110,7 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,target_c
 									first_name=fname,last_name=lname,email=email,position=position))
 		counter = counter + 1
 
-	print(success_text + "[+] Final list contains {0} targets.".format(counter) + end_text)
+	print_success("[+] Final list contains {0} targets.".format(counter))
 	upload_targetlist(master_list_contents,company_domain)
 
 
@@ -122,11 +122,10 @@ def upload_targetlist(master_list_contents,target_company):
 	new_targetlist = Group(name=new_group_name,targets=master_list_contents)
 	try:
 		group = API.groups.post(new_targetlist)
-		print(success_text + "[+] Target list \'{0}\' (ID: {1}) added!".format(
-											new_group_name,group.id,group) + end_text)
+		print_success("[+] Target list \'{0}\' (ID: {1}) added!".format(
+											new_group_name,group.id,group))
 	except Exception as e:
-		print(fail_text + "[-] Target list {0} could not be added: {1}".format(
-																new_group_name,e) + end_text)
+		print_fail("[-] Target list {0} could not be added: {1}".format(new_group_name,e))
 
 
 # Set up Argparse
@@ -140,7 +139,7 @@ parser.add_argument('-v', action='store_true', help='Print version and exit')
 args = parser.parse_args()
 
 if args.v:
-	print(success_text + config.VERSION + end_text)
+	print_success(config.VERSION)
 	sys.exit(0)
 
 if args.t:
@@ -148,7 +147,7 @@ if args.t:
 		template.write("First Name,Last Name,Email,Position\n")
 		template.write("John,Smith,jsmith@aol.com,CEO\n")
 	template.close()
-	print(success_text + "[+] Created GoPhish User Template: template.csv" + end_text)
+	print_success("[+] Created GoPhish User Template: template.csv")
 	sys.exit(0)
 
 if args.d:
@@ -158,16 +157,16 @@ if args.d:
 	if args.f:
 		existing_file = args.f
 		if os.path.exists(existing_file):
-			print(success_text + "[+] Importing {0}...".format(existing_file) + end_text)
+			print_success("[+] Importing {0}...".format(existing_file))
 			start_discovery(company_domain)
 		else:
-			print(fail_text + "[!] Importing {0} failed; does the file exist?".format(
-									existing_file) + end_text)
+			print_fail("[!] Importing {0} failed; does the file exist?".format(
+																existing_file))
 			sys.exit(0)
 	if not args.f: 
 		existing_file = ""
 		start_discovery(company_domain)
 	
 else:
-	print(fail_text + "[-] You must enter a company domain to search!" + end_text)
+	print_fail("[-] You must enter a company domain to search!")
 	sys.exit(0)

@@ -2,7 +2,7 @@
 import requests
 import json
 import re
-from .ui import end_text,warning_text,success_text
+from .ui import *
 
 
 linkedin_emails = []
@@ -12,7 +12,7 @@ linkedin_emails = []
 def scrape_linkedin(company,bing_endpoint,bing_api_key):
 	result_names = []
 	headers = {'Ocp-Apim-Subscription-Key':bing_api_key}
-	print(success_text + "[+] Checking LinkedIn (via Bing Search)" + end_text)
+	print_success("[+] Checking LinkedIn (via Bing Search)")
 	search = " intitle:LinkedIn&customconfig=9ba316ca-9c01-40f4-b45f-d3272abb0af1&mkt=en-US&count=50"
 	url = (bing_endpoint + company + search)
 	r = requests.get(url, headers=headers)
