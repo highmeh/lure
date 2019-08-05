@@ -2,7 +2,7 @@
 import requests,sys,argparse,csv,os
 from gophish import Gophish
 from gophish.models import *
-from resources import config,hunterio,harvester,logo,bing
+from resources import config,hunterio,harvester,bing
 from datetime import datetime
 from resources.ui import *
 
@@ -152,7 +152,7 @@ if args.t:
 
 if args.d:
 	company_domain = args.d
-	logo.display()
+	print_logo()
 	list_resources()
 	if args.f:
 		existing_file = args.f
