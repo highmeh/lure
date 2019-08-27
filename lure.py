@@ -19,15 +19,15 @@ API = Gophish(config.GOPHISH_API_KEY,config.BASE_URL,verify=False)
 def list_resources():
 	gophish_status = check_connection()
 	if config.HUNTERIO == True:
-		print("  [✓] Hunter.io")
+		print("  [X] Hunter.io")
 	if config.HUNTERIO == False:
 		print("  [ ] Hunter.io")
 	if config.LINKEDIN == True:
-		print("  [✓] LinkedIn" + "\t\t\t" + gophish_status)
+		print("  [X] LinkedIn" + "\t\t\t" + gophish_status)
 	if config.LINKEDIN == False:
 		print("  [ ] LinkedIn" + "\t\t\t" + gophish_status)
 	if config.THEHARVESTER == True:
-		print("  [✓] TheHarvester")
+		print("  [X] TheHarvester")
 	if config.THEHARVESTER == False:
 		print("  [ ] TheHarvester")
 	print_warning("-" * 59)
