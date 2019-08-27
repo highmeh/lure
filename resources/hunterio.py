@@ -12,7 +12,7 @@ def get_hunterio_emails(company,API_KEY):
 	calls_allowed = account_info['calls']['available']
 	print_success("[+] Checking hunter.io ({0}/{1} queries remaining)".format(
 										calls_remaining, calls_allowed))
-	results = hunter.domain_search(company, limit=10, emails_type="personal")
+	results = hunter.domain_search(company, limit=1000, emails_type="personal")
 	company_records = results['emails']
 	
 	hunterio_emails = []
