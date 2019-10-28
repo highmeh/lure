@@ -7,7 +7,7 @@ GOPHISH_SERVER = "https://<<phishingserver>>"
 GOPHISH_PORT = 3333
 BASE_URL = GOPHISH_SERVER + ":" + str(GOPHISH_PORT)
 TESTER_NAME = "<<configure me>>"
-VERSION = "Lure v0.1"
+VERSION = "Lure v0.2"
 
 # DISCOVERY CONFIG
 HUNTERIO = True

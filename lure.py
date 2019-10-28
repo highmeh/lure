@@ -2,7 +2,7 @@
 import requests,sys,argparse,csv,os
 from gophish import Gophish
 from gophish.models import *
-from resources import config,hunterio,harvester,bing
+from resources import config,hunterio,harvester,bing,webpage
 from datetime import datetime
 from resources.ui import *
 
@@ -30,6 +30,10 @@ def list_resources():
 		print("  [X] TheHarvester")
 	if config.THEHARVESTER == False:
 		print("  [ ] TheHarvester")
+	if config.WEBPAGE == True:
+		print("  [X] Scrape Webpage")
+	if config.WEBPAGE == False:
+		print("  [ ] Scrape Webpage")	
 	print_warning("-" * 59)
 	print("\n")
 		
@@ -49,7 +53,7 @@ def check_connection():
 
 
 # Use the search_email.py module to search common resources for email addresses
-def start_discovery(target_company):
+def start_discovery(target_company,print_result):
 	if config.HUNTERIO == True:
 		hunterio_emails = hunterio.get_hunterio_emails(company_domain,config.HUNTERIO_API_KEY)
 	if config.HUNTERIO == False:
@@ -70,11 +74,17 @@ def start_discovery(target_company):
 	if config.LINKEDIN == False:
 		bing_emails = ""
 
-	create_master_list(hunterio_emails,harvester_emails,bing_emails,target_company)
+	if config.WEBPAGE == True:
+		webpage_emails = webpage.get_webpage_contents(company_domain)
+
+	if config.WEBPAGE == False:
+		webpage_emails = ""
+
+	create_master_list(hunterio_emails,harvester_emails,bing_emails,webpage_emails,target_company,print_result)
 
 
 # Creates a master list of all target info to send to GoPhish
-def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,target_company):
+def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,webpage_emails,target_company,print_result):
 	assembled_list_contents = []
 	master_list_contents = []
 
@@ -99,19 +109,34 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,target_c
 	for record in linkedin_emails:
 		assembled_list_contents.append(record)
 
+	for record in webpage_emails:
+		assembled_list_contents.append(record)
+
 	counter = 0
 	for line in assembled_list_contents:
-		line = line.split(",")
-		fname = line[0]
-		lname = line[1]
-		email = line[2]
-		position = line[3]
-		master_list_contents.append(User(
-									first_name=fname,last_name=lname,email=email,position=position))
-		counter = counter + 1
+		try:
+			line = line.split(",")
+			fname = line[0]
+			lname = line[1]
+			email = line[2]
+			position = line[3]
+			master_list_contents.append(User(
+										first_name=fname,last_name=lname,email=email,position=position))
+			counter = counter + 1
+		except:
+			pass
+			
+	if counter == 0:
+		print_fail("[-] No targets were found. Check the domain name or add more sources.")
+		sys.exit(0)
 
 	print_success("[+] Final list contains {0} targets.".format(counter))
 	upload_targetlist(master_list_contents,company_domain)
+
+	if print_result == True:
+		print_success("[+] Printing Target Records:")
+		for record in master_list_contents:
+			print(record)
 
 
 
@@ -130,12 +155,13 @@ def upload_targetlist(master_list_contents,target_company):
 
 # Set up Argparse
 progdesc = """ L U R E (Lazy User-Reconnaissance Engine) :: Automate email collection and
-			import results into GoPhish. Built by Jayme Hancock (jhancock@appsecconsulting.com"""
+			import results into GoPhish. Built by Jayme Hancock (jhancock@appsecconsulting.com)"""
 parser = argparse.ArgumentParser(description=progdesc)
 parser.add_argument('-d', metavar='Company Domain', help='Ex: appsecconsulting.com')
 parser.add_argument('-f', metavar='Email File', help='Append an existing CSV to search results')
 parser.add_argument('-t', action='store_true', help='Create a CSV template file')
 parser.add_argument('-v', action='store_true', help='Print version and exit')
+parser.add_argument('-p', action='store_true', help='Print emails to stdout')
 args = parser.parse_args()
 
 if args.v:
@@ -150,6 +176,11 @@ if args.t:
 	print_success("[+] Created GoPhish User Template: template.csv")
 	sys.exit(0)
 
+if args.p:
+	print_result = True
+if not args.p:
+	print_result = False
+
 if args.d:
 	company_domain = args.d
 	print_logo()
@@ -158,14 +189,14 @@ if args.d:
 		existing_file = args.f
 		if os.path.exists(existing_file):
 			print_success("[+] Importing {0}...".format(existing_file))
-			start_discovery(company_domain)
+			start_discovery(company_domain,print_result)
 		else:
 			print_fail("[!] Importing {0} failed; does the file exist?".format(
 																existing_file))
 			sys.exit(0)
 	if not args.f: 
 		existing_file = ""
-		start_discovery(company_domain)
+		start_discovery(company_domain,print_result)
 	
 else:
 	print_fail("[-] You must enter a company domain to search!")

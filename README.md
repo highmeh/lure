@@ -40,3 +40,6 @@ GoPhish will not accept invalid entries. If one of the email addresses is collec
 ![Lure Command Line](https://github.com/highmeh/lure/blob/master/screenshots/lure_cli.png?raw=true)
 
 ![Lure Importing to GoPhish](https://github.com/highmeh/lure/blob/master/screenshots/lure_gophish.png?raw=true)
+
+## CHANGELOG
+20191028: v0.2 Released. Adds function to print records to stdout (-p flag). Adds in webpage email scraping for common webpage locations (on by default). Built in some error logic for domains that are invalid or return no results.
