@@ -126,8 +126,9 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,webpage_
 			position = line[3]
 			excluded = check_exclusions(email)
 			if excluded == True:
+				print_warning("[!] Exclusion Skipped: {0}".format(email))
 				pass
-			if excluded == False:
+			else:
 				master_list_contents.append(User(
 											first_name=fname,last_name=lname,email=email,position=position))
 				counter = counter + 1
@@ -146,11 +147,8 @@ def check_exclusions(email):
 	with open(exclusion_list, "r") as f:
 		for line in f:
 			if line.rstrip() == email.rstrip():
-				print_warning("[!] Exclusion Skipped: {0}".format(email))
 				return True
-		else:
-			return False
-
+	f.close()
 
 def print_options(master_list_contents,target_company):
 	if print_result == True:
