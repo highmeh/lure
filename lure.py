@@ -40,16 +40,20 @@ def list_resources():
 
 # Checks if the GoPhish server is online
 def check_connection():
-	try:
-		r = requests.get(config.BASE_URL,verify=False,timeout=config.TIMEOUT)
-		if r.status_code == 200:
-			gophish_status = success_text + "[+] GoPhish Server Online" + end_text
-		else:
+	if suppress_gophish:
+		gophish_status = success_text + "[+] Ignoring GoPhish." + end_text
+		return gophish_status
+	if not suppress_gophish:
+		try:
+			r = requests.get(config.BASE_URL,verify=False,timeout=config.TIMEOUT)
+			if r.status_code == 200:
+				gophish_status = success_text + "[+] GoPhish Server Online" + end_text
+			else:
+				gophish_status = fail_text + "[-] GoPhish Server Offline" + end_text
+			return gophish_status
+		except:	
 			gophish_status = fail_text + "[-] GoPhish Server Offline" + end_text
-		return gophish_status
-	except:	
-		gophish_status = fail_text + "[-] GoPhish Server Offline" + end_text
-		return gophish_status
+			return gophish_status
 
 
 # Use the search_email.py module to search common resources for email addresses
@@ -120,9 +124,13 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,webpage_
 			lname = line[1]
 			email = line[2]
 			position = line[3]
-			master_list_contents.append(User(
-										first_name=fname,last_name=lname,email=email,position=position))
-			counter = counter + 1
+			excluded = check_exclusions(email)
+			if excluded == True:
+				pass
+			if excluded == False:
+				master_list_contents.append(User(
+											first_name=fname,last_name=lname,email=email,position=position))
+				counter = counter + 1
 		except:
 			pass
 			
@@ -131,18 +139,44 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,webpage_
 		sys.exit(0)
 
 	print_success("[+] Final list contains {0} targets.".format(counter))
-	upload_targetlist(master_list_contents,company_domain)
+	print_options(master_list_contents,target_company)
 
+
+def check_exclusions(email):
+	with open(exclusion_list, "r") as f:
+		for line in f:
+			if line.rstrip() == email.rstrip():
+				print_warning("[!] Exclusion Skipped: {0}".format(email))
+				return True
+		else:
+			return False
+
+
+def print_options(master_list_contents,target_company):
 	if print_result == True:
-		print_success("[+] Printing Target Records:")
+		print_success("[+] Printing Target Record Emails:\n")
 		for record in master_list_contents:
-			print(record)
+			print(record.email)
 
+	if print_csv == True:
+		print_success("[+] Printing Target CSV:\n")
+		print("First Name, Last Name, Position, Email")
+		for record in master_list_contents:
+			fname = record.first_name
+			lname = record.last_name
+			email = record.email
+			position = record.position
+			print(fname + "," + lname + "," + email + "," + position)
+	
+	if not suppress_gophish:
+		upload_targetlist(master_list_contents,company_domain)
+	if suppress_gophish:
+		sys.exit(0)	
 
 
 # Creates a GoPhish group object from the master list, and pushes it to the server with generic name
 def upload_targetlist(master_list_contents,target_company):
-	current_date = datetime.today().strftime('%Y%m%d')
+	current_date = datetime.today().strftime('%Y%m%d%H%M%S')
 	new_group_name = current_date + "_" + config.TESTER_NAME + "_" + target_company
 	new_targetlist = Group(name=new_group_name,targets=master_list_contents)
 	try:
@@ -155,13 +189,16 @@ def upload_targetlist(master_list_contents,target_company):
 
 # Set up Argparse
 progdesc = """ L U R E (Lazy User-Reconnaissance Engine) :: Automate email collection and
-			import results into GoPhish. Built by Jayme Hancock (jhancock@appsecconsulting.com)"""
+			import results into GoPhish. Built by Jayme Hancock (jayme.hancock@bsigroup.com)"""
 parser = argparse.ArgumentParser(description=progdesc)
 parser.add_argument('-d', metavar='Company Domain', help='Ex: appsecconsulting.com')
 parser.add_argument('-f', metavar='Email File', help='Append an existing CSV to search results')
 parser.add_argument('-t', action='store_true', help='Create a CSV template file')
 parser.add_argument('-v', action='store_true', help='Print version and exit')
 parser.add_argument('-p', action='store_true', help='Print emails to stdout')
+parser.add_argument('-c', action='store_true', help='Print CSV Formatted data')
+parser.add_argument('-x', action='store_true', help='Dont connect to GoPhish, just do the OSINT')
+parser.add_argument('-e', metavar='Exclusion File', help='Exclusion file. One email per line.')
 args = parser.parse_args()
 
 if args.v:
@@ -180,6 +217,19 @@ if args.p:
 	print_result = True
 if not args.p:
 	print_result = False
+
+if args.c:
+	print_csv = True
+if not args.c:
+	print_csv = False
+
+if args.x:
+	suppress_gophish = True
+if not args.x:
+	suppress_gophish = False
+
+if args.e:
+	exclusion_list = args.e
 
 if args.d:
 	company_domain = args.d

@@ -5,7 +5,7 @@ fail_text = "\033[91m"
 
 def print_logo():
 	print(warning_text + "\n   L U R E  |  Phishing Target Collection Automation")
-	print("               jhancock@appsecconsulting.com")
+	print("               jayme.hancock@bsigroup.com")
 	print("-----------------------------------------------------------" + end_text)
 	return
 
