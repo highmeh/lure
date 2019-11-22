@@ -146,7 +146,7 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,webpage_
 def check_exclusions(email):
 	with open(exclusion_list, "r") as f:
 		for line in f:
-			if line.rstrip() == email.rstrip():
+			if line.rstrip().lower() == email.rstrip().lower():
 				return True
 	f.close()
 
