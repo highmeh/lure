@@ -10,6 +10,7 @@ Lure currently searches the following sources:
 - Hunter.io
 - theHarvester
 - LinkedIn (via Bing Search API)
+- Common website 'contact' locations
 
 ## How do I run Lure?  
 - Clone the git repo: ``git clone https://github.com/highmeh/lure/lure.git``
@@ -29,6 +30,15 @@ Yes, edit resources/config.py and change the sources to "True" or "False"
 
 ## Lure is taking a long time to complete.
 Disable theHarvester in resources/config.py. theHarvester takes a long time to generate very few results. 
+
+## What if I want to use lure For OSINT, but not phishing?
+Use the "-x" switch to ignore the GoPhish server options entirely.
+
+## How do I get a list of my results?
+Use "-c" for Comma-Separated Value output, or "-p" to print e-mail addresses only.
+
+## How do I exclude pre-defined/out of scope users from ending up in a contact list?
+Create an exclusions file. Add the emails you want to exclude, one per line, into a text file and run lure with the "-e file.txt" option.
 
 ## Where do I enter API keys, tester names, and other variables?
 Edit resources/config.py. You can run ``mv resources/config.sample.py resources/config.py`` to fill in the configuration template.
