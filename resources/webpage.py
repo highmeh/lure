@@ -24,7 +24,7 @@ def strip_tags(html):
 
 # Scrape common web locations for email addresses
 def get_webpage_contents(company):
-	print_success("[+] Checking common webpage locations...")
+	print_success("[+] Checking common webpage locations")
 	scraped_webpage_emails = []
 	urls_to_check = ["/","/contact","/contactus","/about","/aboutus","/careers",
 					"/ourcompany","/company","/ourteam","/team","/about-us", 

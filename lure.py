@@ -2,7 +2,7 @@
 import requests,sys,argparse,csv,os
 from gophish import Gophish
 from gophish.models import *
-from resources import config,hunterio,harvester,bing,webpage
+from resources import config,hunterio,harvester,bing,mailshunt,webpage,github,hibp
 from datetime import datetime
 from resources.ui import *
 
@@ -18,18 +18,28 @@ API = Gophish(config.GOPHISH_API_KEY,config.BASE_URL,verify=False)
 # Lists resources that Lure can use to search for e-mail addresses
 def list_resources():
 	gophish_status = check_connection()
+	hibp_status = check_hibp_status(enable_hibp)
+
 	if config.HUNTERIO == True:
-		print("  [X] Hunter.io")
+		print("  [X] Hunter.io" + "\t\t\t" + gophish_status)
 	if config.HUNTERIO == False:
-		print("  [ ] Hunter.io")
+		print("  [ ] Hunter.io" + "\t\t\t" + gophish_status)
 	if config.LINKEDIN == True:
-		print("  [X] LinkedIn" + "\t\t\t" + gophish_status)
+		print("  [X] LinkedIn" + "\t\t\t" + hibp_status)
 	if config.LINKEDIN == False:
-		print("  [ ] LinkedIn" + "\t\t\t" + gophish_status)
+		print("  [ ] LinkedIn" + "\t\t\t" + hibp_status)
+	if config.GITHUB == True:
+		print("  [X] GitHub")
+	if config.GITHUB == False:
+		print("  [ ] GitHub")	
 	if config.THEHARVESTER == True:
 		print("  [X] TheHarvester")
 	if config.THEHARVESTER == False:
 		print("  [ ] TheHarvester")
+	if config.MAILSHUNT == True:
+		print("  [X] MailsHunt")
+	if config.MAILSHUNT == False:
+		print("  [ ] MailsHunt")		
 	if config.WEBPAGE == True:
 		print("  [X] Scrape Webpage")
 	if config.WEBPAGE == False:
@@ -38,10 +48,17 @@ def list_resources():
 	print("\n")
 		
 
+def check_hibp_status(enable_hibp):
+	if enable_hibp == "True":
+		hibp_status = success_text + "[+] HIBP Checking Enabled." + end_text
+	if enable_hibp == "False":
+		hibp_status = warning_text + "[!] HIBP Checking Disabled" + end_text
+	return hibp_status
+
 # Checks if the GoPhish server is online
 def check_connection():
 	if suppress_gophish:
-		gophish_status = success_text + "[+] Ignoring GoPhish." + end_text
+		gophish_status = warning_text + "[+] Ignoring GoPhish." + end_text
 		return gophish_status
 	if not suppress_gophish:
 		try:
@@ -57,7 +74,7 @@ def check_connection():
 
 
 # Use the search_email.py module to search common resources for email addresses
-def start_discovery(target_company,print_result):
+def start_discovery(target_company,print_result,exclusion_list,enable_hibp):
 	if config.HUNTERIO == True:
 		hunterio_emails = hunterio.get_hunterio_emails(company_domain,config.HUNTERIO_API_KEY)
 	if config.HUNTERIO == False:
@@ -78,17 +95,33 @@ def start_discovery(target_company,print_result):
 	if config.LINKEDIN == False:
 		bing_emails = ""
 
+	if config.GITHUB == True:
+		company = company_domain.split('.')[0]
+		github_emails = github.find_github_emails(company,company_domain,config.GITHUB_ENDPOINT,
+												config.GITHUB_USERNAME,config.GITHUB_API_KEY)
+	if config.GITHUB == False:
+		github_emails = ""
+
+	if config.MAILSHUNT == True:
+		mailshunt_emails = mailshunt.get_mailshunt_emails(company_domain)
+
+	if config.MAILSHUNT == False:
+		mailshunt_emails = ""
+
 	if config.WEBPAGE == True:
 		webpage_emails = webpage.get_webpage_contents(company_domain)
 
 	if config.WEBPAGE == False:
 		webpage_emails = ""
 
-	create_master_list(hunterio_emails,harvester_emails,bing_emails,webpage_emails,target_company,print_result)
+	create_master_list(hunterio_emails,harvester_emails,bing_emails,github_emails,mailshunt_emails,
+		webpage_emails,target_company,print_result,exclusion_list,enable_hibp)
 
 
 # Creates a master list of all target info to send to GoPhish
-def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,webpage_emails,target_company,print_result):
+def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,github_emails,
+						mailshunt_emails, webpage_emails,target_company,print_result,exclusion_list,
+						enable_hibp):
 	assembled_list_contents = []
 	master_list_contents = []
 
@@ -113,10 +146,17 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,webpage_
 	for record in linkedin_emails:
 		assembled_list_contents.append(record)
 
+	for record in github_emails:
+		assembled_list_contents.append(record)
+
+	for record in mailshunt_emails:
+		assembled_list_contents.append(record)
+
 	for record in webpage_emails:
 		assembled_list_contents.append(record)
 
-	counter = 0
+	counter = 0 
+
 	for line in assembled_list_contents:
 		try:
 			line = line.split(",")
@@ -124,17 +164,26 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,webpage_
 			lname = line[1]
 			email = line[2]
 			position = line[3]
-			excluded = check_exclusions(email)
-			if excluded == True:
-				print_warning("[!] Exclusion Skipped: {0}".format(email))
-				pass
+			if not "None" in exclusion_list:
+				excluded = check_exclusions(email)
+				if excluded == True:
+					print_warning("[!] Exclusion Skipped: {0}".format(email))
+					pass
+
+			if enable_hibp == "True":
+				hibp.check_email_in_hibp(email,config.HIBP_APP,config.HIBP_KEY)
+				master_list_contents.append(User(
+				first_name=fname,last_name=lname,email=email,position=position))
+				counter = counter + 1
+
+
 			else:
 				master_list_contents.append(User(
-											first_name=fname,last_name=lname,email=email,position=position))
+									first_name=fname,last_name=lname,email=email,position=position))
 				counter = counter + 1
 		except:
 			pass
-			
+
 	if counter == 0:
 		print_fail("[-] No targets were found. Check the domain name or add more sources.")
 		sys.exit(0)
@@ -144,11 +193,12 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,webpage_
 
 
 def check_exclusions(email):
-	with open(exclusion_list, "r") as f:
-		for line in f:
-			if line.rstrip().lower() == email.rstrip().lower():
-				return True
-	f.close()
+	if exclusion_list:
+		with open(exclusion_list, "r") as f:
+			for line in f:
+				if line.rstrip().lower() == email.rstrip().lower():
+					return True
+		f.close()
 
 def print_options(master_list_contents,target_company):
 	if print_result == True:
@@ -197,6 +247,7 @@ parser.add_argument('-p', action='store_true', help='Print emails to stdout')
 parser.add_argument('-c', action='store_true', help='Print CSV Formatted data')
 parser.add_argument('-x', action='store_true', help='Dont connect to GoPhish, just do the OSINT')
 parser.add_argument('-e', metavar='Exclusion File', help='Exclusion file. One email per line.')
+parser.add_argument('--pwned', action='store_true', help='Check emails against Have I Been Pwned?')
 args = parser.parse_args()
 
 if args.v:
@@ -226,8 +277,15 @@ if args.x:
 if not args.x:
 	suppress_gophish = False
 
-if args.e:
+if args.e is not None:
 	exclusion_list = args.e
+if args.e is None:
+	exclusion_list = "None"
+
+if args.pwned:
+	enable_hibp ="True"
+if not args.pwned:
+	enable_hibp = "False"
 
 if args.d:
 	company_domain = args.d
@@ -237,14 +295,14 @@ if args.d:
 		existing_file = args.f
 		if os.path.exists(existing_file):
 			print_success("[+] Importing {0}...".format(existing_file))
-			start_discovery(company_domain,print_result)
+			start_discovery(company_domain,print_result,exclusion_list,enable_hibp)
 		else:
 			print_fail("[!] Importing {0} failed; does the file exist?".format(
 																existing_file))
 			sys.exit(0)
 	if not args.f: 
 		existing_file = ""
-		start_discovery(company_domain,print_result)
+		start_discovery(company_domain,print_result,exclusion_list,enable_hibp)
 	
 else:
 	print_fail("[-] You must enter a company domain to search!")
