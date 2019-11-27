@@ -8,7 +8,7 @@ Lure assists in phishing target collection by pulling and parsing email addresse
 ## What sources does Lure search?  
 Lure currently searches the following, but more sources are being added all the time. 
 |          Source          | Authenticated |
-|--------------------------|---------------|
+| ------------------------ | ------------- |
 | Hunter.io                |      Yes      |
 | theHarvester             |      No       |
 | LinkedIn*                |      Yes      |
