@@ -15,7 +15,7 @@ BING_API_KEY = "<<api key>>"
 GITHUB_USERNAME	  = "<<github username>>"
 GITHUB_API_KEY = "<<github api key>>"
 
-# DISCOVERY CONFIG - Change tehse to True or False to search/exclude sources
+# DISCOVERY CONFIG - Change these to True or False to search/exclude sources
 #					 By default, only unauthenticated web searches are enabled.
 HUNTERIO = False
 THEHARVESTER = False
