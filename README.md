@@ -7,13 +7,14 @@ Lure assists in phishing target collection by pulling and parsing email addresse
   
 ## What sources does Lure search?  
 Lure currently searches the following, but more sources are being added all the time. 
-|          Source          | Authenticated |
-| ------------------------ | ------------- |
-| Hunter.io                |      Yes      |
-| theHarvester             |      No       |
-| LinkedIn*                |      Yes      |
-| MailsHunt                |      No       |
-| Common website Locations |      No       |
+
+|     Source     | Authenticated? | Default? |
+|:--------------:|:--------------:|:--------:|
+| Hunter.io      |       Yes      |    No    |
+| TheHarvester   |       No       |    No    |
+| LinkedIn*      |       Yes      |    No    |
+| MailsHunt      |       No       |    Yes   |
+| Website Scrape |       No       |    Yes   |
   
 
  * LinkedIn searching leverages the Bing API, Not the LinkedIn API.
