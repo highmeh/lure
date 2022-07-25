@@ -191,17 +191,19 @@ def print_options(master_list_contents,target_company):
 	if print_result == True:
 		print_success("[+] Printing Target Record Emails:\n")
 		for record in master_list_contents:
-			print(record.email)
+			if record:
+				print(record.email)
 
 	if print_csv == True:
 		print_success("[+] Printing Target CSV:\n")
 		print("First Name, Last Name, Position, Email")
 		for record in master_list_contents:
-			fname = record.first_name
-			lname = record.last_name
-			email = record.email
-			position = record.position
-			print(fname + "," + lname + "," + email + "," + position)
+			if record:
+				fname = record.first_name
+				lname = record.last_name
+				email = record.email
+				position = record.position
+				print(fname + "," + lname + "," + email + "," + position)
 	
 	if not suppress_gophish:
 		upload_targetlist(master_list_contents,company_domain)
