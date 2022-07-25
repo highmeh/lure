@@ -13,7 +13,6 @@ Lure currently searches the following, but more sources are being added all the 
 | Hunter.io      |       Yes      |    No    |
 | TheHarvester   |       No       |    No    |
 | LinkedIn*      |       Yes      |    No    |
-| MailsHunt      |       No       |    Yes   |
 | Website Scrape |       No       |    Yes   |
   
 

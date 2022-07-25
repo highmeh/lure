@@ -20,7 +20,6 @@ GITHUB_API_KEY = "<<github api key>>"
 HUNTERIO = False
 THEHARVESTER = False
 LINKEDIN = False
-MAILSHUNT = True
 WEBPAGE = True
 GITHUB = False
 

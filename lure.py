@@ -2,7 +2,7 @@
 import requests,sys,argparse,csv,os
 from gophish import Gophish
 from gophish.models import *
-from resources import config,hunterio,harvester,bing,mailshunt,webpage,github,hibp
+from resources import config,hunterio,harvester,bing,webpage,github,hibp
 from datetime import datetime
 from resources.ui import *
 
@@ -36,10 +36,6 @@ def list_resources():
 		print("  [X] TheHarvester")
 	if config.THEHARVESTER == False:
 		print("  [ ] TheHarvester")
-	if config.MAILSHUNT == True:
-		print("  [X] MailsHunt")
-	if config.MAILSHUNT == False:
-		print("  [ ] MailsHunt")		
 	if config.WEBPAGE == True:
 		print("  [X] Scrape Webpage")
 	if config.WEBPAGE == False:
@@ -102,25 +98,19 @@ def start_discovery(target_company,print_result,exclusion_list,enable_hibp):
 	if config.GITHUB == False:
 		github_emails = ""
 
-	if config.MAILSHUNT == True:
-		mailshunt_emails = mailshunt.get_mailshunt_emails(company_domain)
-
-	if config.MAILSHUNT == False:
-		mailshunt_emails = ""
-
 	if config.WEBPAGE == True:
 		webpage_emails = webpage.get_webpage_contents(company_domain)
 
 	if config.WEBPAGE == False:
 		webpage_emails = ""
 
-	create_master_list(hunterio_emails,harvester_emails,bing_emails,github_emails,mailshunt_emails,
+	create_master_list(hunterio_emails,harvester_emails,bing_emails,github_emails,
 		webpage_emails,target_company,print_result,exclusion_list,enable_hibp)
 
 
 # Creates a master list of all target info to send to GoPhish
 def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,github_emails,
-						mailshunt_emails, webpage_emails,target_company,print_result,exclusion_list,
+						 webpage_emails,target_company,print_result,exclusion_list,
 						enable_hibp):
 	assembled_list_contents = []
 	master_list_contents = []
@@ -147,9 +137,6 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,github_e
 		assembled_list_contents.append(record)
 
 	for record in github_emails:
-		assembled_list_contents.append(record)
-
-	for record in mailshunt_emails:
 		assembled_list_contents.append(record)
 
 	for record in webpage_emails:
