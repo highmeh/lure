@@ -124,8 +124,7 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,github_e
 				lname = line[1]
 				email = line[2]
 				position = line[3]
-				master_list_contents.append(User(
-									first_name=fname,last_name=lname,email=email,position=position))		
+				master_list_contents.append(User(first_name=fname,last_name=lname,email=email,position=position))
 
 	for record in hunterio_emails:
 		assembled_list_contents.append(record)
@@ -145,32 +144,27 @@ def create_master_list(hunterio_emails,harvester_emails,linkedin_emails,github_e
 	counter = 0 
 
 	for line in assembled_list_contents:
-		try:
-			line = line.split(",")
-			fname = line[0]
-			lname = line[1]
-			email = line[2]
-			position = line[3]
-			if not "None" in exclusion_list:
-				excluded = check_exclusions(email)
-				if excluded == True:
-					print_warning("[!] Exclusion Skipped: {0}".format(email))
-					pass
+		line = line.split(",")
+		fname = line[0]
+		lname = line[1]
+		email = line[2]
+		position = line[3]
+		if not "None" in exclusion_list:
+			excluded = check_exclusions(email)
+			if excluded == True:
+				print_warning("[!] Exclusion Skipped: {0}".format(email))
+				pass
 
-			if enable_hibp == "True":
-				hibp.check_email_in_hibp(email,config.HIBP_APP,config.HIBP_KEY)
-				master_list_contents.append(User(
-				first_name=fname,last_name=lname,email=email,position=position))
-				counter = counter + 1
+		if enable_hibp == "True":
+			hibp.check_email_in_hibp(email,config.HIBP_APP,config.HIBP_KEY)
+			master_list_contents.append(User(first_name=fname,last_name=lname,email=email,position=position))
 
 
-			else:
-				master_list_contents.append(User(
-									first_name=fname,last_name=lname,email=email,position=position))
-				counter = counter + 1
-		except:
-			pass
+		else:
+			master_list_contents.append(User(first_name=fname,last_name=lname,email=email,position=position))
 
+		counter = counter + 1	
+	
 	if counter == 0:
 		print_fail("[-] No targets were found. Check the domain name or add more sources.")
 		sys.exit(0)
@@ -191,14 +185,14 @@ def print_options(master_list_contents,target_company):
 	if print_result == True:
 		print_success("[+] Printing Target Record Emails:\n")
 		for record in master_list_contents:
-			if record:
+			if target_company.lower() in record.email.lower():
 				print(record.email)
 
 	if print_csv == True:
 		print_success("[+] Printing Target CSV:\n")
 		print("First Name, Last Name, Position, Email")
 		for record in master_list_contents:
-			if record:
+			if target_company.lower() in record.email.lower():
 				fname = record.first_name
 				lname = record.last_name
 				email = record.email
@@ -208,7 +202,7 @@ def print_options(master_list_contents,target_company):
 	if not suppress_gophish:
 		upload_targetlist(master_list_contents,company_domain)
 	if suppress_gophish:
-		sys.exit(0)	
+		sys.exit(0)
 
 
 # Creates a GoPhish group object from the master list, and pushes it to the server with generic name
@@ -226,9 +220,9 @@ def upload_targetlist(master_list_contents,target_company):
 
 # Set up Argparse
 progdesc = """ L U R E (Lazy User-Reconnaissance Engine) :: Automate email collection and
-			import results into GoPhish. Built by Jayme Hancock (jayme.hancock@bsigroup.com)"""
+			import results into GoPhish. Built by Jayme Hancock (jayme@blackjacknetworks.com)"""
 parser = argparse.ArgumentParser(description=progdesc)
-parser.add_argument('-d', metavar='Company Domain', help='Ex: appsecconsulting.com')
+parser.add_argument('-d', metavar='Company Domain', help='Ex: google.com')
 parser.add_argument('-f', metavar='Email File', help='Append an existing CSV to search results')
 parser.add_argument('-t', action='store_true', help='Create a CSV template file')
 parser.add_argument('-v', action='store_true', help='Print version and exit')

@@ -29,6 +29,7 @@ def scrape_linkedin(company,bing_endpoint,bing_api_key):
 		return(result_names)
 	except:
 		pass
+
 # Strip out commonly used phrases in advertisements and non-People results
 def sanitize_results(result_names,company_domain):
 	linkedin_emails = []
@@ -48,7 +49,6 @@ def sanitize_results(result_names,company_domain):
 				domain = company_domain
 				email = fname[0] + lname + "@" + domain
 				linkedin_emails.append(fname + "," + lname + "," + email + ",None")
-
 		return linkedin_emails
 
 	elif not result_names:
