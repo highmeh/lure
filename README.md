@@ -65,4 +65,6 @@ GoPhish will not accept invalid entries. If one of the email addresses is collec
 
 20191122: v0.3 Released. Suppress the upload to GoPhish (OSINT Only Mode) (-x). Exclude emails from an exclusion list (-e excludes.txt). Print emails only (-p). Print CSV Contents (-c).
 
-20191125: v0.4 Released. Adds support for MailsHunt and for GitHub searches. Reorganized config.sample.py for easier reading/parsing. Minor bug fixes.
+20191125: v0.4 Released. Adds support for MailsHunt and for GitHub searches. Reorganized config.sample.py for easier reading/parsing. Minor bug fixes.  
+
+20230730: v0.4 Updated. Changed how data is received from hunter.io and bing/linkedin searches. Note that HIBP is currently broken.
